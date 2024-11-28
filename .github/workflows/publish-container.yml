@@ -1,0 +1,30 @@
+name: Build and Push container image
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions: write-all
+
+    env:
+      IMAGE_TAG: ghcr.io/owalmirneto/kamago
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build  image
+        run: docker build -t ghcr.io/${{ env.IMAGE_TAG }}:latest .
+
+      - name: Push  image
+        run: docker push ghcr.io/${{ env.IMAGE_TAG }}:latest
